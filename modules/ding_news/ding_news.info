@@ -96,4 +96,3 @@ features[views_view][] = ding_news
 features[views_view][] = ding_node
 features_exclude[variable][node_options_ding_news] = node_options_ding_news
 mtime = 1509018468
-
