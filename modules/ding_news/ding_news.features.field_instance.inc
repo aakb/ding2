@@ -98,7 +98,7 @@ function ding_news_field_default_field_instances() {
       'weight' => 32,
     ),
   );
-
+  
   // Exported field_instance: 'node-ding_news-field_ding_news_body'.
   $field_instances['node-ding_news-field_ding_news_body'] = array(
     'bundle' => 'ding_news',
@@ -978,7 +978,6 @@ function ding_news_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Body');
   t('Category');
   t('Display this event in the selected group (temapage).');
   t('Files');
