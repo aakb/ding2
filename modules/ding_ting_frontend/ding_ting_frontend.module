@@ -55,6 +55,10 @@ function ding_ting_frontend_entity_info_alter(&$entity_info) {
         'label' => t('Teaser'),
         'custom settings' => TRUE,
       ),
+      'paragraphs_teaser' => array(
+        'label' => t('Paragraphs teaser'),
+        'custom settings' => TRUE,
+      ),
     );
   }
 }
