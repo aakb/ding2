@@ -163,7 +163,7 @@ function ddbasic_preprocess__node__ding_event(&$variables) {
       // Date.
       if (!empty($date)) {
         // When the user saves the event time (e.g. danish time 2018-01-10 00:00),
-        // the value is saved in the database in UTC time 
+        // the value is saved in the database in UTC time
         // (e.g. UTC time 2018-01-09 23:00). To print out the date/time properly
         // We first need to create the dateObject with the UTC database time, and
         // afterwards we can convert the dateObject db-time to localtime.
@@ -254,6 +254,14 @@ function ddbasic_preprocess__node__ding_event(&$variables) {
       }
       break;
   }
+}
+
+/**
+ * Implements preprocess__node__ding_campaign_plus();
+ */
+function ddbasic_preprocess__node__ding_campaign_plus(&$variables) {
+  $type = ding_base_get_value('node', $variables['node'], 'field_ding_campaign_plus_style', 'value');
+  $variables['campaign_type'] = $type == 'box' ? 'ding-campaign-medium-width' : 'ding-campaign-full-width';
 }
 
 /**

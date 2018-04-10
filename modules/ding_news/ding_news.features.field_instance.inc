@@ -156,7 +156,7 @@ function ding_news_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_ding_news_body',
     'label' => 'Body',
-    'required' => 0,
+    'required' => 1,
     'settings' => array(
       'text_processing' => 1,
       'user_register_form' => FALSE,
@@ -379,7 +379,7 @@ function ding_news_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_ding_news_lead',
     'label' => 'Lead',
-    'required' => 0,
+    'required' => 1,
     'settings' => array(
       'text_processing' => 0,
       'user_register_form' => FALSE,
