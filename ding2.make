@@ -162,6 +162,9 @@ projects[languageicons][version] = "1.0"
 
 projects[lazy_pane][subdir] = "contrib"
 projects[lazy_pane][version] = "1.2"
+; Fix cache id lenght - https://www.drupal.org/project/lazy_pane/issues/2677950
+projects[lazy_pane][patch][] = "https://www.drupal.org/files/issues/hash_pane_ids.patch"
+
 
 projects[leaflet][subdir] = "contrib"
 projects[leaflet][version] = "1.1"

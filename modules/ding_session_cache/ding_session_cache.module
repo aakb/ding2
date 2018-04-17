@@ -72,10 +72,13 @@ function ding_session_cache_form_system_performance_settings_alter(&$form, &$for
  *   Index used to store the data under.
  * @param mixed $data
  *   Data to store in the cache.
+ * @param int $expire
+ *   The time to which the cache should be valid. Default to configuration.
  */
-function ding_session_cache_set($module, $cid, $data) {
+function ding_session_cache_set($module, $cid, $data, $expire = NULL) {
   if (_ding_session_cache_enabled($module)) {
-    cache_set(_ding_session_cache_get_cid($module, $cid), $data, 'cache_ding_session_cache', _ding_session_cache_get_expire($module));
+    $expire = is_null($expire) ?  _ding_session_cache_get_expire($module) : $expire;
+    cache_set(_ding_session_cache_get_cid($module, $cid), $data, 'cache_ding_session_cache', $expire);
   }
 }
 
