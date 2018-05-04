@@ -1,0 +1,23 @@
+<?php
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implements hook_das_menu().
+ */
+function ting_das_menu() {
+  $items = array();
+
+  $items['admin/config/ting/das'] = array(
+    'title' => 'Digital article service',
+    'description' => 'Configure access to DAS.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ting_das_admin_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'includes/ting_das.admin.inc',
+  );
+
+  return $items;
+}

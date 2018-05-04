@@ -1,0 +1,6 @@
+name = Ting digital article service
+description = Use DAS from KB to order articles.
+core = 7.x
+package = Ding!
+project = ting_das
+dependencies[] = ting
