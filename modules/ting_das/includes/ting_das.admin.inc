@@ -21,7 +21,7 @@ function ting_das_admin_settings_form() {
     '#type' => 'textfield',
     '#title' => t('End point'),
     '#description' => t('The service endpoint for "placeCopyRequest". E.g https://developer.statsbiblioteket.dk/elba-webservices/services/placeCopyRequest'),
-    '#default_value' => $default['ting_das']['url'] ?? '',
+    '#default_value' => $default['url'] ?? '',
   );
 
   // Username / password
@@ -29,14 +29,14 @@ function ting_das_admin_settings_form() {
     '#type' => 'textfield',
     '#title' => t('Username'),
     '#description' => t('The username required to use the web-service.'),
-    '#default_value' => $default['ting_das']['username'] ?? '',
+    '#default_value' => $default['username'] ?? '',
   );
 
-  $form['ting_das']['passwd'] = array(
+  $form['ting_das']['password'] = array(
     '#type' => 'textfield',
     '#title' => t('Password'),
     '#description' => t('The password required to use the web-service.'),
-    '#default_value' => $default['ting_das']['passwd'] ?? '',
+    '#default_value' => $default['password'] ?? '',
   );
   return system_settings_form($form);
 }
