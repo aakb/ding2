@@ -99,79 +99,6 @@ function ding_news_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-ding_news-field_ding_news_body'.
-  $field_instances['node-ding_news-field_ding_news_body'] = array(
-    'bundle' => 'ding_news',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'alternative_layout_full' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 6,
-      ),
-      'block_feature' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 5,
-      ),
-      'default' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 9,
-      ),
-      'full' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 5,
-      ),
-      'search_result' => array(
-        'label' => 'hidden',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 6,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 11,
-      ),
-      'teaser_highlight' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 11,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_ding_news_body',
-    'label' => 'Body',
-    'required' => 1,
-    'settings' => array(
-      'text_processing' => 1,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 20,
-      ),
-      'type' => 'text_textarea',
-      'weight' => 6,
-    ),
-  );
-
   // Exported field_instance: 'node-ding_news-field_ding_news_category'.
   $field_instances['node-ding_news-field_ding_news_category'] = array(
     'bundle' => 'ding_news',
@@ -269,7 +196,7 @@ function ding_news_field_default_field_instances() {
         'module' => 'file',
         'settings' => array(),
         'type' => 'file_default',
-        'weight' => 10,
+        'weight' => 11,
       ),
       'full' => array(
         'label' => 'above',
@@ -588,7 +515,86 @@ function ding_news_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-ding_news-field_ding_news_show_as_list'.
+  // Exported field_instance: 'node-ding_news-field_ding_news_paragraphs'
+  $field_instances['node-ding_news-field_ding_news_paragraphs'] = array(
+    'bundle' => 'ding_news',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Close all paragraphs to change the order',
+    'display' => array(
+      'alternative_layout_full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'paragraphs',
+        'settings' => array(
+          'view_mode' => 'full',
+        ),
+        'type' => 'paragraphs_view',
+        'weight' => 10,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser_highlight' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_ding_news_paragraphs',
+    'label' => 'Paragraphs',
+    'required' => 0,
+    'settings' => array(
+      'add_mode' => 'select',
+      'allowed_bundles' => array(
+        'ding_paragraphs_carousel' => 'ding_paragraphs_carousel',
+        'ding_paragraphs_image' => 'ding_paragraphs_image',
+        'ding_paragraphs_image_and_text' => 'ding_paragraphs_image_and_text',
+        'ding_paragraphs_material_list' => 'ding_paragraphs_material_list',
+        'ding_paragraphs_single_material' => 'ding_paragraphs_single_material',
+        'ding_paragraphs_text' => 'ding_paragraphs_text',
+        'ding_paragraphs_text_box' => 'ding_paragraphs_text_box',
+      ),
+      'bundle_weights' => array(
+        'ding_paragraphs_carousel' => 11,
+        'ding_paragraphs_image' => -5,
+        'ding_paragraphs_image_and_text' => -4,
+        'ding_paragraphs_material_list' => -12,
+        'ding_paragraphs_single_material' => 9,
+        'ding_paragraphs_text' => -6,
+        'ding_paragraphs_text_box' => 5,
+      ),
+      'default_edit_mode' => 'closed',
+      'title' => 'Paragraph',
+      'title_multiple' => 'Paragraphs',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'paragraphs',
+      'settings' => array(),
+      'type' => 'paragraphs_embed',
+      'weight' => 39,
+    ),
+  );
+
+  // Exported field_instance: 'node-ding_news-field_ding_news_show_as_list'
   $field_instances['node-ding_news-field_ding_news_show_as_list'] = array(
     'bundle' => 'ding_news',
     'default_value' => array(
@@ -686,7 +692,7 @@ function ding_news_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 11,
+        'weight' => 12,
       ),
       'full' => array(
         'label' => 'above',
@@ -978,8 +984,8 @@ function ding_news_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Body');
   t('Category');
+  t('Close all paragraphs to change the order');
   t('Display this event in the selected group (temapage).');
   t('Files');
   t('Groups');
@@ -987,6 +993,7 @@ function ding_news_field_default_field_instances() {
   t('Library');
   t('List image');
   t('Materials');
+  t('Paragraphs');
   t('Select the libraries this content should be associated with.');
   t('Show as material list');
   t('Tags');
