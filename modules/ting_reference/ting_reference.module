@@ -189,7 +189,6 @@ function _ting_reference_field_update($entity_type, $entity, &$items) {
 
   // Clear cache.
   field_cache_clear();
-
 }
 
 
@@ -197,11 +196,6 @@ function _ting_reference_field_update($entity_type, $entity, &$items) {
  * Field_update for cron.
  */
 function _ting_reference_field_update_cron($entity_type, $entity, &$items) {
-
-  // Get the entity's id.
-  $entity_ids = entity_extract_ids($entity_type, $entity);
-  $entity_id = array_shift($entity_ids);
-
   // Get existing relations.
   $relations = ting_reference_get_relations($entity_type, $entity);
 
