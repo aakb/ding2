@@ -10,14 +10,14 @@
 class TingDasCopyRequest {
 
   private $url;
-  private $username;
-  private $password;
+  private $ws_username;
+  private $ws_password;
 
   private $pid = NULL;
   private $userLoanerId = NULL;
   private $userName = NULL;
   private $mail = NULL;
-  private $userInterestDate = NULL;
+  private $userInterestDays = NULL;
   private $pickupAgencyId = NULL;
   private $agencyId = NULL;
   private $publicationTitle = NULL;
@@ -39,8 +39,8 @@ class TingDasCopyRequest {
    */
   public function __construct(string $url, string $username, string $password) {
     $this->url = $url;
-    $this->username = $username;
-    $this->password = $password;
+    $this->ws_username = $username;
+    $this->ws_password = $password;
   }
 
   /**
@@ -144,25 +144,29 @@ class TingDasCopyRequest {
    *
    * The date until the user is not longer interested in getting the material.
    *
-   * @param string $userInterestDate
-   *   The users interest date.
+   * @param string $userInterestDays
+   *   The users interest date in number of days.
    *
    * @return TingDasCopyRequest
    *   The current request object.
    */
-  public function setUserInterestDate(string $userInterestDate) {
-    $this->userInterestDate = $userInterestDate;
+  public function setUserInterestDate(string $userInterestDays) {
+    $this->userInterestDays = $userInterestDays;
     return $this;
   }
 
   /**
    * Get the users interest date.
    *
+   * @param string $format
+   *   The date format to use.
+   *
    * @return string|null
-   *   The users interest date.
+   *   The users interest date in the format given from now.
    */
-  public function getUserInterestDate() {
-    return $this->userInterestDate;
+  public function getUserInterestDate($format = 'Y-m-d') {
+    $date = strtotime('+'.$this->userInterestDays.' day');
+    return date($format, $date);
   }
 
   /**
@@ -354,6 +358,9 @@ class TingDasCopyRequest {
     return $this->pagesOfComponent;
   }
 
+  /**
+   * Send request to the service.
+   */
   public function send() {
     $options = [
       'headers' => [
@@ -362,31 +369,47 @@ class TingDasCopyRequest {
       'body' => $this->buildMessage(),
     ];
 
-    $client = new GuzzleHttp\Client();
-    $response = $client->request('POST', $this->url, $options);
+    try {
+      $client = new GuzzleHttp\Client();
+      $response = $client->request('POST', $this->url, $options);
+
+      if ($response->getStatusCode() == 204 && $response->getReasonPhrase() == 'ACT') {
+        return TRUE;
+      }
+    }
+    catch (\GuzzleHttp\Exception\GuzzleException $exception) {
+      watchdog_exception('ting_das', $exception);
+    }
+
+    return FALSE;
   }
 
+  /**
+   * Build XML message
+   *
+   * @return string
+   *   The message as XML.
+   */
   private function buildMessage() {
-    $msg = '';
+    $xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><placeCopyRequest xmlns="http://statsbiblioteket.dk/xws/elba-placecopyrequest-schema"/>');
 
-    $msg = '<placeCopyRequest xmlns="http://statsbiblioteket.dk/xws/elba-placecopyrequest-schema" xsi:schemaLocation="http://statsbiblioteket.dk/xws/elba-placecopyrequest-schema schema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-              <ws_user>ELBA_ITK</ws_user>
-              <ws_password>w6yXiRFo9xFp</ws_password>
-              <pid>870971-tsart:37767824</pid>
-              <user_loaner_id>string</user_loaner_id>
-              <userName>Jesper Kristensen</userName>
-              <userMail>jeskr@aarhus.dk</userMail>
-              <user_interest_date>2018-05-15</user_interest_date>
-              <pickupAgencyId>775100</pickupAgencyId>
-              <agencyId>775100</agencyId>
-              <publicationTitle>Festivalen må aldrig blive kommerciel</publicationTitle>
-              <publicationDateOfComponent></publicationDateOfComponent>
-              <publicationYearOfComponent></publicationYearOfComponent>
-              <issueOfComponent></issueOfComponent>
-              <volumeOfComponent></volumeOfComponent>
-              <pagesOfComponent></pagesOfComponent>
-            </placeCopyRequest>';
+    // Set required fields.
+    $xml->addChild('ws_user', $this->ws_username);
+    $xml->addChild('ws_password', $this->ws_password);
+    $xml->addChild('pid', $this->getPid());
+    $xml->addChild('user_loaner_id', $this->getUserLoanerId());
+    $xml->addChild('userName', $this->getUserName());
+    $xml->addChild('userMail', $this->getUserMail());
+    $xml->addChild('user_interest_date', $this->getUserInterestDate('Y-m-d'));
+    $xml->addChild('pickupAgencyId', $this->getPickupAgencyId());
+    $xml->addChild('agencyId', $this->getAgencyId());
+    $xml->addChild('publicationTitle', $this->getPublicationTitle());
+    $xml->addChild('publicationDateOfComponent', $this->getPublicationDateOfComponent());
+    $xml->addChild('publicationYearOfComponent', $this->getPublicationYearOfComponent());
+    $xml->addChild('issueOfComponent', $this->getIssueOfComponent());
+    $xml->addChild('volumeOfComponent', $this->getVolumeOfComponent());
+    $xml->addChild('pagesOfComponent', $this->getPagesOfComponent());
 
-    return $msg;
+    return $xml->asXML();
   }
 }

@@ -38,5 +38,26 @@ function ting_das_admin_settings_form() {
     '#description' => t('The password required to use the web-service.'),
     '#default_value' => $default['password'] ?? '',
   );
+
+  $form['ting_das_consent'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Digital article server'),
+    '#description' => t('Information to the user about the usage for the data sent and handled by the DAS service.'),
+    '#tree' => TRUE,
+  );
+
+  $form['ting_das_consent']['prefix'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Description of data usage'),
+    '#rows' => 8,
+  );
+
+  $form['ting_das_consent']['label'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Label text for the agree checkbox'),
+    '#rows' => 4,
+  );
+
+
   return system_settings_form($form);
 }

@@ -121,24 +121,37 @@ function ting_das_ajax($entity) {
   }
   elseif (!ding_user_is_provider_user($user)) {
     // Error not library user.
-    $commands[] = ajax_command_ding_popup('ting_das', t('Error'), '<p>' . t('Only library user can make DAS requests.') . '</p>');
+    $commands[] = ajax_command_ding_popup('ting_das', t('Error'), '<p>' . t('Only library user can make DAS requests.') . '</p>', array('refresh' => FALSE));
   }
   elseif (!(is_object($entity) && $entity instanceof TingEntity)) {
     // Error not ting entity.
-    $commands[] = ajax_command_ding_popup('ting_das', t('Error'), '<p>' . t('Unable to load information about the material.') . '</p>');
+    $commands[] = ajax_command_ding_popup('ting_das', t('Error'), '<p>' . t('Unable to load information about the material.') . '</p>', array('refresh' => FALSE));
   }
   else {
 
     $form = drupal_get_form('ting_das_order_form', $entity);
     $content = drupal_render($form);
-    $commands[] = ajax_command_ding_popup('ting_das', t('Order digital copy'), $content);
+    $commands[] = ajax_command_ding_popup('ting_das', t('Order digital copy'), $content, array('refresh' => FALSE));
   }
 
   // Return the ajax commands as an render array.
   return array('#type' => 'ajax', '#commands' => $commands);
 }
 
-function ting_das_order_form($form_id, &$form_state, $entity) {
+/**
+ * Defines the order copy form.
+ *
+ * @param string $form_id
+ *   The forms id.
+ * @param array $form_state
+ *   The current state of the form.
+ * @param \TingEntity $entity
+ *   The entity the form was activated on.
+ *
+ * @return array
+ *   The form.
+ */
+function ting_das_order_form($form_id, &$form_state, TingEntity $entity) {
   $form = array();
 
   global $user;
@@ -147,6 +160,20 @@ function ting_das_order_form($form_id, &$form_state, $entity) {
   if ($profile) {
     $profile = entity_metadata_wrapper('profile2', $profile);
   }
+
+  $form['entity'] = array(
+    '#tree' => TRUE,
+  );
+
+  $form['entity']['pid'] = array(
+    '#type' => 'value',
+    '#value' => $entity->getId(),
+  );
+
+  $form['entity']['title'] = array(
+    '#type' => 'value',
+    '#value' => $entity->getTitle(),
+  );
 
   $form['name'] = array(
     '#type' => 'textfield',
@@ -160,12 +187,24 @@ function ting_das_order_form($form_id, &$form_state, $entity) {
     '#default_value' => $profile ? $profile->{'field_' . $provider['module'] . '_mail'}->value() : '',
   );
 
+  $form['loaner_id'] = array(
+    '#type' => 'password',
+    '#title' => t('Loaner id'),
+  );
+
   $function = $provider['module'] . '_user_branches';
   $preferred_branch = $profile ? $profile->{'field_' . $provider['module'] . '_preferred_branch'}->value() : '';
   $form += ding_reservation_default_options_branch('fbs_preferred_branch', $preferred_branch, $function($user));
 
   $default_interest_period = ding_provider_invoke('reservation', 'default_interest_period');
   $form += ding_reservation_interest_period_selector('interest_period', $default_interest_period, _ting_das_get_interest_periods());
+
+  $defaults = variable_get('ting_das_consent', FALSE);
+  $form['consent'] = array(
+    '#type' => 'checkbox',
+    '#title' => $defaults['label'] ?? t('I agree to the terms of usage'),
+    '#prefix' => $defaults['prefix']
+  );
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -174,17 +213,45 @@ function ting_das_order_form($form_id, &$form_state, $entity) {
       'callback' => 'ting_das_order_form_ajax_callback',
     ),
     '#value' => t('Order digital copy'),
+    '#states' => array(
+      'disabled' => array(
+        ':input[name="consent"]' => array(
+          'unchecked' => TRUE,
+        ),
+      ),
+    ),
   );
 
   return $form;
 }
 
+/**
+ * Submit handler for the order form.
+ */
 function ting_das_order_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
   $client = _ting_das_get_client();
+
+
+  $client->setUserName($values['name']);
+  $client->setUserMail($values['mail']);
+  $client->setUserLoanerId($values['loaner_id']);
+  $client->setUserInterestDate($values['interest_period']);
+  $client->setPickupAgencyId($values['fbs_preferred_branch']);
+  $client->setAgencyId(variable_get('ting_agency', ''));
+
+  $client->setPid($values['entity']['pid']);
+  $client->setPublicationTitle($values['entity']['title']);
+
+  $status = $client->send();
+  $t=1;
 
   // @TODO: Set order status in form_state for ajax callback.
 }
 
+/**
+ * Ajax callback for the order copy form.
+ */
 function ting_das_order_form_ajax_callback($form, &$form_state) {
   // @TODO: Handle status from form_state.
 
@@ -194,7 +261,7 @@ function ting_das_order_form_ajax_callback($form, &$form_state) {
   );
 
   $html = theme('status_messages') . t('Your order have been placed.');
-  $response['#commands'][] = ajax_command_ding_popup('ding_reservation', t('Digital copy ordered'), $html, array('refresh' => TRUE));
+  $response['#commands'][] = ajax_command_ding_popup('ding_reservation', t('Digital copy ordered'), $html, array('refresh' => FALSE));
 
   return $response;
 }
