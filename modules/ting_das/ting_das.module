@@ -42,6 +42,26 @@ function ting_das_permission() {
 }
 
 /**
+ * Implements hook_libraries_info().
+ *
+ * For defining external libraries.
+ */
+function ting_das_libraries_info() {
+  return array(
+    'guzzle' => array(
+      'name' => 'Guzzle',
+      'vendor url' => 'https://github.com/guzzle/guzzle',
+      'download url' => 'https://github.com/guzzle/guzzle',
+      'version' => '6.2',
+      'xautoload' => function ($adapter) {
+        $adapter->composerJson('composer.json');
+      },
+    ),
+  );
+}
+
+
+/**
  * Implements hook_ding_entity_buttons().
  */
 function ting_das_ding_entity_buttons($type, $entity, $widget = 'default') {
@@ -98,14 +118,14 @@ function ting_das_ajax($entity) {
   global $user;
   if (!user_is_logged_in()) {
     $commands[] = ajax_command_ding_user_authenticate('');
-//  }
-//  elseif (!ding_user_is_provider_user($user)) {
-//    // Error not library user.
-//    $commands[] = ajax_command_ding_popup('ting_das', t('Error'), '<p>' . t('Only library user can make DAS requests.') . '</p>');
-//  }
-//  elseif (!(is_object($entity) && $entity instanceof TingEntity)) {
-//    // Error not ting entity.
-//    $commands[] = ajax_command_ding_popup('ting_das', t('Error'), '<p>' . t('Unable to load information about the material.') . '</p>');
+  }
+  elseif (!ding_user_is_provider_user($user)) {
+    // Error not library user.
+    $commands[] = ajax_command_ding_popup('ting_das', t('Error'), '<p>' . t('Only library user can make DAS requests.') . '</p>');
+  }
+  elseif (!(is_object($entity) && $entity instanceof TingEntity)) {
+    // Error not ting entity.
+    $commands[] = ajax_command_ding_popup('ting_das', t('Error'), '<p>' . t('Unable to load information about the material.') . '</p>');
   }
   else {
 
@@ -122,24 +142,36 @@ function ting_das_order_form($form_id, &$form_state, $entity) {
   $form = array();
 
   global $user;
+  $provider = _ding_provider_get_provider('user');
+  $profile = ding_user_provider_profile($user);
+  if ($profile) {
+    $profile = entity_metadata_wrapper('profile2', $profile);
+  }
 
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Name'),
-    '#default_value' => $user->name ?? '',
+    '#default_value' => $profile ? $profile->{'field_' . $provider['module'] . '_name'}->value() : '',
   );
 
   $form['mail'] = array(
     '#type' => 'textfield',
     '#title' => t('Mail address'),
-    '#default_value' => $user->mail ?? '',
+    '#default_value' => $profile ? $profile->{'field_' . $provider['module'] . '_mail'}->value() : '',
   );
+
+  $function = $provider['module'] . '_user_branches';
+  $preferred_branch = $profile ? $profile->{'field_' . $provider['module'] . '_preferred_branch'}->value() : '';
+  $form += ding_reservation_default_options_branch('fbs_preferred_branch', $preferred_branch, $function($user));
+
+  $default_interest_period = ding_provider_invoke('reservation', 'default_interest_period');
+  $form += ding_reservation_interest_period_selector('interest_period', $default_interest_period, _ting_das_get_interest_periods());
 
   $form['submit'] = array(
     '#type' => 'submit',
     '#submit' => array('ting_das_order_form_submit'),
     '#ajax' => array(
-      'callback' => 'ting_das_order_form_callback',
+      'callback' => 'ting_das_order_form_ajax_callback',
     ),
     '#value' => t('Order digital copy'),
   );
@@ -149,9 +181,13 @@ function ting_das_order_form($form_id, &$form_state, $entity) {
 
 function ting_das_order_form_submit($form, &$form_state) {
   $client = _ting_das_get_client();
+
+  // @TODO: Set order status in form_state for ajax callback.
 }
 
-function ting_das_order_form_callback($form, &$form_state) {
+function ting_das_order_form_ajax_callback($form, &$form_state) {
+  // @TODO: Handle status from form_state.
+
   $response = array(
     '#type' => 'ajax',
     '#commands' => array(),
@@ -163,6 +199,12 @@ function ting_das_order_form_callback($form, &$form_state) {
   return $response;
 }
 
+/**
+ * Get DAS client.
+ *
+ * @return \TingDasCopyRequest
+ *   Client to communicate with the service.
+ */
 function _ting_das_get_client() {
   static $client;
 
@@ -173,9 +215,31 @@ function _ting_das_get_client() {
       $client = new TingDasCopyRequest($config['url'], $config['username'], $config['password']);
     }
     else {
-      watchdog('ting_das', 'The module is missing its configuration', NULL, WATCHDOG_ERROR);
+      watchdog('ting_das', 'The ting_das module is missing its configuration', NULL, WATCHDOG_ERROR);
     }
   }
 
   return $client;
+}
+
+/**
+ * Get interest periods options for orders placed in DAS.
+ *
+ * @return array
+ *   The interest periods index by days and formatted as months.
+ */
+function _ting_das_get_interest_periods() {
+  $periods = array(
+    1 => 30,
+    2 => 60,
+    3 => 90,
+    6 => 180,
+    12 => 360,
+  );
+  $options = array();
+  foreach ($periods as $months => $days) {
+    $options[$days] = format_plural($months, '1 month', '@count months');
+  }
+
+  return $options;
 }

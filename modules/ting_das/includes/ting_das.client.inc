@@ -354,14 +354,39 @@ class TingDasCopyRequest {
     return $this->pagesOfComponent;
   }
 
-
   public function send() {
-    // Add option to send CURL parameters with the request. This can be used
-    // to send requests through a SOCKS5 ssh proxy.
-    $curl_options = variable_get('ting_das_curl_options', array());
+    $options = [
+      'headers' => [
+        'Content-Type' => 'application/xml; charset=UTF8',
+      ],
+      'body' => $this->buildMessage(),
+    ];
 
-    $client = new NanoSOAPClient($this->url, array('curl' => $curl_options));
-    $response = $client->call($soapAction, $soapParameters);
+    $client = new GuzzleHttp\Client();
+    $response = $client->request('POST', $this->url, $options);
   }
 
+  private function buildMessage() {
+    $msg = '';
+
+    $msg = '<placeCopyRequest xmlns="http://statsbiblioteket.dk/xws/elba-placecopyrequest-schema" xsi:schemaLocation="http://statsbiblioteket.dk/xws/elba-placecopyrequest-schema schema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <ws_user>ELBA_ITK</ws_user>
+              <ws_password>w6yXiRFo9xFp</ws_password>
+              <pid>870971-tsart:37767824</pid>
+              <user_loaner_id>string</user_loaner_id>
+              <userName>Jesper Kristensen</userName>
+              <userMail>jeskr@aarhus.dk</userMail>
+              <user_interest_date>2018-05-15</user_interest_date>
+              <pickupAgencyId>775100</pickupAgencyId>
+              <agencyId>775100</agencyId>
+              <publicationTitle>Festivalen må aldrig blive kommerciel</publicationTitle>
+              <publicationDateOfComponent></publicationDateOfComponent>
+              <publicationYearOfComponent></publicationYearOfComponent>
+              <issueOfComponent></issueOfComponent>
+              <volumeOfComponent></volumeOfComponent>
+              <pagesOfComponent></pagesOfComponent>
+            </placeCopyRequest>';
+
+    return $msg;
+  }
 }
