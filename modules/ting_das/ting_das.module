@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- *
+ * Handle the integration of digital article service (DAS) into the CMS.
  */
 
 /**

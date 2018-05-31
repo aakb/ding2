@@ -39,6 +39,25 @@ function ting_das_admin_settings_form() {
     '#default_value' => $default['password'] ?? '',
   );
 
+  $types = variable_get('ting_well_types', _ting_fetch_well_types());
+  $form['ting_das_types'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Data well types'),
+    '#description' => t('Ting objects defined as being able order via the DAS service.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['ting_das_types']['ting_das_data_well_types'] = array(
+    '#type' => 'checkboxes',
+    '#options' => drupal_map_assoc($types),
+    '#default_value' => variable_get('ting_das_data_well_types', array(
+      'tidsskriftsartikel',
+      'avisartikel',
+      'artikel',
+    )),
+  );
+
   $form['ting_das_consent'] = array(
     '#type' => 'fieldset',
     '#title' => t('Digital article server'),
