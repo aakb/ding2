@@ -362,12 +362,12 @@ class TingDasCopyRequest {
    * Send request to the service.
    */
   public function send() {
-    $options = [
-      'headers' => [
+    $options = array(
+      'headers' => array(
         'Content-Type' => 'application/xml; charset=UTF8',
-      ],
+      ),
       'body' => $this->buildMessage(),
-    ];
+    );
 
     try {
       $client = new GuzzleHttp\Client();

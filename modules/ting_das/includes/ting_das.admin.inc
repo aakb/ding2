@@ -21,7 +21,7 @@ function ting_das_admin_settings_form() {
     '#type' => 'textfield',
     '#title' => t('End point'),
     '#description' => t('The service endpoint for "placeCopyRequest". E.g https://developer.statsbiblioteket.dk/elba-webservices/services/placeCopyRequest'),
-    '#default_value' => $default['url'] ?? '',
+    '#default_value' => isset($default['url']) ? $default['url'] : '',
   );
 
   // Username / password
@@ -29,14 +29,14 @@ function ting_das_admin_settings_form() {
     '#type' => 'textfield',
     '#title' => t('Username'),
     '#description' => t('The username required to use the web-service.'),
-    '#default_value' => $default['username'] ?? '',
+    '#default_value' => isset($default['username']) ? $default['username'] : '',
   );
 
   $form['ting_das']['password'] = array(
     '#type' => 'textfield',
     '#title' => t('Password'),
     '#description' => t('The password required to use the web-service.'),
-    '#default_value' => $default['password'] ?? '',
+    '#default_value' => isset($default['password']) ? $default['password'] : '',
   );
 
   $types = variable_get('ting_well_types', _ting_fetch_well_types());
