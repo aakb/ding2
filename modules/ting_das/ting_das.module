@@ -196,8 +196,8 @@ function ting_das_order_form($form_id, &$form_state, TingEntity $entity) {
   $defaults = variable_get('ting_das_consent', FALSE);
   $form['consent'] = array(
     '#type' => 'checkbox',
-    '#title' => $defaults['label'] ?? t('I agree to the terms of usage'),
-    '#prefix' => $defaults['prefix']
+    '#title' => isset($defaults['label']) ? $defaults['label'] : t('I agree to the terms of usage'),
+    '#prefix' => $defaults['prefix'],
   );
 
   $form['submit'] = array(
