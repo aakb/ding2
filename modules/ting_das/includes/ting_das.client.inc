@@ -374,6 +374,7 @@ class TingDasCopyRequest {
       $response = $client->request('POST', $this->url, $options);
 
       if ($response->getStatusCode() == 204 && $response->getReasonPhrase() == 'ACT') {
+        watchdog('ting_das', 'Service returned: !code', array('!code' => $response->getStatusCode()), WATCHDOG_ERROR);
         return TRUE;
       }
     }
