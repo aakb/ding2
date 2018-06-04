@@ -54,6 +54,7 @@ function ting_das_admin_settings_form() {
     '#default_value' => _ting_das_get_default_well_types(),
   );
 
+  $defaults = variable_get('ting_das_consent');
   $form['ting_das_consent'] = array(
     '#type' => 'fieldset',
     '#title' => t('Digital article server'),
@@ -65,12 +66,14 @@ function ting_das_admin_settings_form() {
     '#type' => 'textarea',
     '#title' => t('Description of data usage'),
     '#rows' => 8,
+    '#default_value' => isset($defaults['prefix']) ? $defaults['prefix'] : '',
   );
 
   $form['ting_das_consent']['label'] = array(
     '#type' => 'textarea',
     '#title' => t('Label text for the agree checkbox'),
     '#rows' => 4,
+    '#default_value' => isset($defaults['label']) ? $defaults['label'] : t('I agree to the terms of usage'),
   );
 
 
