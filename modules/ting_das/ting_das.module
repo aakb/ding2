@@ -67,7 +67,7 @@ function ting_das_libraries_info() {
 function ting_das_ding_entity_buttons($type, $entity, $widget = 'default') {
   $button = '';
 
-  if ($type == 'ding_entity' && $entity->is('reservable')) {
+  if (_ting_das_show_button($type, $entity)) {
     switch ($widget) {
       case 'ajax':
         drupal_add_library('system', 'drupal.ajax');
@@ -75,13 +75,13 @@ function ting_das_ding_entity_buttons($type, $entity, $widget = 'default') {
         $button = array(
           array(
             '#theme' => 'link',
-            '#text' => t('DAS'),
+            '#text' => t('Order digital copy'),
             '#path' => 'das/' . $entity->id . '/order',
             '#options' => array(
               'attributes' => array(
                 'class' => array(
                   'action-button',
-                  'reserve-button',
+                  'button-see-online',
                   'use-ajax',
                 ),
                 'id' => 'das-order-' . $entity->id,
@@ -287,6 +287,40 @@ function _ting_das_get_client() {
   }
 
   return $client;
+}
+
+/**
+ * Check if the "order" button should be shown.
+ *
+ * @param $type
+ *   The entity type.
+ * @param \TingEntity $entity
+ *   The TingEntity that should or should not have the "order" button shown.
+ *
+ * @return bool
+ *   TRUE if it should be shown else FALSE.
+ */
+function _ting_das_show_button($type, TingEntity $entity) {
+  $types = array_filter(_ting_das_get_default_well_types());
+  if ($type == 'ding_entity' && in_array(drupal_strtolower($entity->getType()), $types)) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Get the default material types that can be ordered in DAS.
+ *
+ * @return string[]
+ *   The types
+ */
+function _ting_das_get_default_well_types() {
+  return variable_get('ting_das_data_well_types', array(
+    'tidsskriftsartikel',
+    'avisartikel',
+    'artikel',
+  ));
 }
 
 /**

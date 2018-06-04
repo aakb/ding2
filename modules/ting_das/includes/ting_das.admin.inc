@@ -51,11 +51,7 @@ function ting_das_admin_settings_form() {
   $form['ting_das_types']['ting_das_data_well_types'] = array(
     '#type' => 'checkboxes',
     '#options' => drupal_map_assoc($types),
-    '#default_value' => variable_get('ting_das_data_well_types', array(
-      'tidsskriftsartikel',
-      'avisartikel',
-      'artikel',
-    )),
+    '#default_value' => _ting_das_get_default_well_types(),
   );
 
   $form['ting_das_consent'] = array(
