@@ -66,14 +66,14 @@ function ting_das_admin_settings_form() {
     '#type' => 'textarea',
     '#title' => t('Description of data usage'),
     '#rows' => 8,
-    '#default_value' => isset($default['prefix']) ? $default['prefix'] : '',
+    '#default_value' => isset($defaults['prefix']) ? $defaults['prefix'] : '',
   );
 
   $form['ting_das_consent']['label'] = array(
     '#type' => 'textarea',
     '#title' => t('Label text for the agree checkbox'),
     '#rows' => 4,
-    '#default_value' => isset($default['label']) ? $default['label'] : t('I agree to the terms of usage'),
+    '#default_value' => isset($defaults['label']) ? $defaults['label'] : t('I agree to the terms of usage'),
   );
 
 
