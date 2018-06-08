@@ -125,7 +125,7 @@ function ting_das_ajax($entity) {
 
     $form = drupal_get_form('ting_das_order_form', $entity);
     $content = drupal_render($form);
-    $commands[] = ajax_command_ding_popup('ting_das', t('Order digital copy'), $content, array('refresh' => FALSE));
+    $commands[] = ajax_command_ding_popup('ting_das', t('Order digital copy'), $content, array('refresh' => TRUE));
   }
 
   // Return the ajax commands as an render array.
@@ -173,17 +173,23 @@ function ting_das_order_form($form_id, &$form_state, TingEntity $entity) {
     '#type' => 'textfield',
     '#title' => t('Name'),
     '#default_value' => $profile ? $profile->{'field_' . $provider['module'] . '_name'}->value() : '',
+    '#required' => TRUE,
   );
 
   $form['mail'] = array(
     '#type' => 'textfield',
     '#title' => t('Mail address'),
     '#default_value' => $profile ? $profile->{'field_' . $provider['module'] . '_mail'}->value() : '',
+    '#element_validate' => array(
+      'ting_das_mail_validate',
+    ),
+    '#required' => TRUE,
   );
 
   $form['loaner_id'] = array(
     '#type' => 'password',
     '#title' => t('Loaner id'),
+    '#required' => TRUE,
   );
 
   $function = $provider['module'] . '_user_branches';
@@ -198,6 +204,7 @@ function ting_das_order_form($form_id, &$form_state, TingEntity $entity) {
     '#type' => 'checkbox',
     '#title' => !empty($defaults['label']) ? $defaults['label'] : t('I agree to the terms of usage'),
     '#prefix' => $defaults['prefix'],
+    '#required' => TRUE,
   );
 
   $form['submit'] = array(
@@ -219,26 +226,24 @@ function ting_das_order_form($form_id, &$form_state, TingEntity $entity) {
   return $form;
 }
 
+
+/**
+ * Mail validation.
+ */
+function ting_das_mail_validate($element, $form_state) {
+  $email = $element['#value'];
+  if (!empty($email)) {
+    if (!ding_base_validate_email($email)) {
+      form_set_error($element['#name'], t('Please fill in a valid email'));
+    }
+  }
+}
+
 /**
  * Submit handler for the order form.
  */
 function ting_das_order_form_submit($form, &$form_state) {
-  $values = $form_state['values'];
-  $client = _ting_das_get_client();
 
-
-  $client->setUserName($values['name']);
-  $client->setUserMail($values['mail']);
-  $client->setUserLoanerId($values['loaner_id']);
-  $client->setUserInterestDate($values['interest_period']);
-  $client->setPickupAgencyId($values['fbs_preferred_branch']);
-  $client->setAgencyId(variable_get('ting_agency', ''));
-
-  $client->setPid($values['entity']['pid']);
-  $client->setPublicationTitle($values['entity']['title']);
-
-  $status = $client->send();
-  $form_state['das_status'] = $status;
 }
 
 /**
@@ -250,13 +255,37 @@ function ting_das_order_form_ajax_callback($form, &$form_state) {
     '#commands' => array(),
   );
 
-  if ($form_state['das_status']) {
-    $html = theme('status_messages') . t('Your order have been placed.');
+  $t = form_get_errors();
+
+  if (is_null(form_get_errors())) {
+    $values = $form_state['values'];
+    $client = _ting_das_get_client();
+
+    $client->setUserName($values['name']);
+    $client->setUserMail($values['mail']);
+    $client->setUserLoanerId($values['loaner_id']);
+    $client->setUserInterestDate($values['interest_period']);
+    $client->setPickupAgencyId($values['fbs_preferred_branch']);
+    $client->setAgencyId(variable_get('ting_agency', ''));
+
+    $client->setPid($values['entity']['pid']);
+    $client->setPublicationTitle($values['entity']['title']);
+    $status = $client->send();
+
+    if ($status) {
+      $html = theme('status_messages') . t('Your order have been placed.');
+      $response['#commands'][] = ajax_command_ding_popup('ding_reservation', t('Success'), $html, array('refresh' => FALSE));
+    }
+    else {
+      $html = theme('status_messages') . t('Your order failed. Please try again.');
+      $response['#commands'][] = ajax_command_ding_popup('ding_reservation', t('Error'), $html, array('refresh' => FALSE));
+    }
   }
   else {
-    $html = theme('status_messages') . t('Your order failed. Please try again.');
+    unset($form['user_login_container']['close']);
+    $html = theme('status_messages') . drupal_render($form);
+    $response['#commands'][] = ajax_command_ding_popup('ting_das', t('Order digital copy'), $html, array('refresh' => TRUE));
   }
-  $response['#commands'][] = ajax_command_ding_popup('ding_reservation', t('Error'), $html, array('refresh' => FALSE));
 
   return $response;
 }
