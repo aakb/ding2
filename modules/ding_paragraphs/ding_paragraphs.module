@@ -1,0 +1,187 @@
+<?php
+
+/**
+ * @file
+ * Code for the Ding paragraphs feature.
+ */
+
+include_once 'ding_paragraphs.features.inc';
+
+/**
+ * Implements hook_preprocess_entity().
+ */
+function ding_paragraphs_preprocess_node(&$variables) {
+  if (isset($variables['field_ding_news_paragraphs']) || isset($variables['field_ding_page_paragraphs'])) {
+    drupal_add_library('system', 'drupal.ajax');
+    drupal_add_library('system', 'ui.widget');
+    drupal_add_js(drupal_get_path('module', 'ding_paragraphs') . '/js/ding_paragraphs.js', 'file');
+    drupal_add_js(drupal_get_path('module', 'ding_availability') . '/js/ding_availability.js', 'file');
+  }
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function ding_paragraphs_entity_info_alter(&$entity_info) {
+  $entity_info['ting_object']['view modes'] += array(
+    'paragraphs_teaser' => array(
+      'label' => t('Paragraphs teaser'),
+      'custom settings' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add js for form.
+ */
+function ding_paragraphs_form_node_form_alter(&$form, $form_state) {
+  // Check for field existence.
+  $paragraph_field = FALSE;
+  if (isset($form['field_ding_page_paragraphs'])) {
+    $paragraph_field = 'field_ding_page_paragraphs';
+  }
+  if (isset($form['field_ding_news_paragraphs'])) {
+    $paragraph_field = 'field_ding_news_paragraphs';
+  }
+
+  if ($paragraph_field) {
+    // Attach js to form.
+    $form['#attached'] = array(
+      'js' => array(
+        array(
+          'type' => 'file',
+          'data' => drupal_get_path('module', 'ding_paragraphs') . '/js/ding_paragraphs_form.js',
+        ),
+      ),
+    );
+
+    // Add information for each paragraph in backend.
+    foreach ($form[$paragraph_field][LANGUAGE_NONE] as $key => $value) {
+      if (is_array($value) && isset($value['#entity_type']) && $value['#entity_type'] == 'paragraphs_item') {
+        $wrapper = entity_metadata_wrapper($value['#entity_type'], $value['#entity']);
+        $output = FALSE;
+        switch ($value['#bundle']) {
+          case 'ding_paragraphs_image_and_text':
+            $image_wrapper = $wrapper->field_ding_paragraphs_image->value();
+            // Add image and text snippet.
+            $image_display = '';
+            if (isset($image_wrapper['0'])) {
+              $image = $wrapper->field_ding_paragraphs_image->value()['0'];
+              $image['style_name'] = 'thumbnail';
+              $image['path'] = $image['uri'];
+              $image_display = theme_image_style($image);
+            }
+
+            $output = $image_display . ' - ' . mb_strimwidth(strip_tags($wrapper->field_ding_paragraphs_text->value()['value']), 0, 30, "...");
+            break;
+
+          case 'ding_paragraphs_text_box':
+            // Add text snippet.
+            $output = mb_strimwidth(strip_tags($wrapper->field_ding_paragraphs_box_text->value()['value']), 0, 30, "...");
+            break;
+
+          case 'ding_paragraphs_image':
+            // For some unknown reason the previously defined wrapper is off,
+            // so we grab the image entity from elsewhere.
+            $wrapper = entity_metadata_wrapper('paragraphs_item', $value['field_ding_paragraphs_image'][LANGUAGE_NONE]['0']['#entity']);
+            // Add image.
+            $image = $wrapper->field_ding_paragraphs_image->value()['0'];
+            $image['style_name'] = 'thumbnail';
+            $image['path'] = $image['uri'];
+            $output = theme_image_style($image);
+            break;
+
+          case 'ding_paragraphs_text':
+            // Add text snippet.
+            // A little more letters since this is the wrapping text.
+            $output = mb_strimwidth(strip_tags($wrapper->field_ding_paragraphs_text->value()['value']), 0, 50, "...");
+            break;
+        }
+        // Alter markup of each paragraph.
+        if ($output) {
+          $form[$paragraph_field][LANGUAGE_NONE][$key]['paragraph_bundle_title']['info']['#markup'] .= ' - ' . $output;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_bpi_convert_to_bpi_alter().
+ *
+ * @see https://github.com/rimi-itk/ding2/blob/Issue-3062-syndicate-campaign/modules/ding_campaign/ding_campaign.bpi.inc
+ */
+function ding_paragraphs_bpi_convert_to_bpi_alter(&$bpi_content, $entity, array $context) {
+  $entity_type = 'node';
+  list($id, , $bundle_name) = entity_extract_ids($entity_type, $entity);
+
+  if (isset($id)) {
+    $paragraphs_fields = field_read_fields(array(
+      'type' => 'paragraphs',
+      'entity_type' => $entity_type,
+      'bundle' => $bundle_name,
+    ));
+    // @FIXME: What language to use?
+    // $lang = $entity->language;
+    $lang = LANGUAGE_NONE;
+
+    $paragraphs_data = array();
+    $body = '';
+
+    foreach ($paragraphs_fields as $paragraphs_field_name => $paragraphs_field) {
+      if (isset($entity->$paragraphs_field_name)) {
+        $field = $entity->$paragraphs_field_name;
+        if (isset($field[$lang]) && is_array($field[$lang])) {
+          $ids = paragraphs_field_item_to_ids($field[$lang]);
+          // We have to reset cache when loading paragraphs items.
+          $paragraphs_items = paragraphs_item_load_multiple($ids, NULL, TRUE);
+          if (is_array($paragraphs_items)) {
+            foreach ($paragraphs_items as $paragraphs_item) {
+              $fields = field_info_instances($paragraphs_item->entityType(), $paragraphs_item->bundle());
+              $item = array(
+                'field_name' => $paragraphs_field_name,
+                'bundle' => $paragraphs_item->bundle(),
+              );
+              foreach ($fields as $field) {
+                $item[$field['field_name']] = $paragraphs_item->{$field['field_name']};
+              }
+              $paragraphs_data[$paragraphs_field_name][] = $item;
+            }
+
+            // Render the paragraph content.
+            $view = field_view_field($entity_type, $entity, $paragraphs_field_name, array('label' => 'hidden'));
+            $body .= drupal_render($view);
+          }
+        }
+      }
+
+      $helper = new DingParagraphsHelper();
+
+      if (isset($context['with_images'])) {
+        $assets = $helper->replaceFilesWithUrls($paragraphs_data);
+        if (!empty($assets)) {
+          $bpi_content['assets'] += $assets;
+        }
+      }
+
+      $helper->processMaterials($paragraphs_data, $context['with_refs']);
+
+      $bpi_content['data'] = json_encode($paragraphs_data);
+      $bpi_content['body'] = $body;
+    }
+  }
+}
+
+/**
+ * Implements hook_bpi_syndicate_node_form_alter().
+ */
+function ding_paragraphs_bpi_syndicate_node_form_alter(&$form, &$context) {
+  $form_state = &$context['form_state'];
+  $bpi_node = $context['bpi_node'];
+  $syndicated_images = $context['syndicated_images'];
+
+  $helper = new DingParagraphsHelper();
+  $helper->addBpiParagraphs($form, $form_state, $bpi_node, $syndicated_images);
+}
