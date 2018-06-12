@@ -236,31 +236,46 @@ function ding_entity_field_formatter_view($entity_type, $entity, $field, $instan
   foreach ($items as $delta => $item) {
     switch ($display['type']) {
       case 'ding_entity_buttons_default':
-        $element[$delta] = module_invoke_all('ding_entity_buttons', 'ding_entity', $entity, '', $element);
+        $element[$delta] = _ding_entity_invoke_entity_buttons_hook($entity);
         break;
 
       case 'ding_entity_buttons_ajax':
-        $hook = 'ding_entity_buttons';
-        $buttons = array();
-        foreach (module_implements($hook) as $module) {
-          $function = $module . '_' . $hook;
-          if (function_exists($function)) {
-            $result = call_user_func_array($function, array('ding_entity', $entity, 'ajax', $buttons));
-            if (isset($result) && is_array($result)) {
-              $buttons = array_merge_recursive($buttons, $result);
-            }
-            elseif (isset($result)) {
-              $buttons[] = $result;
-            }
-          }
-        }
-
-        $element[$delta] = $buttons;
+        $element[$delta] = _ding_entity_invoke_entity_buttons_hook($entity, 'ajax');
         break;
     }
   }
 
   return $element;
+}
+
+/**
+ * Helper function to invoke entity buttons hook.
+ *
+ * @param $entity
+ *   The entity invoke the hook for.
+ * @param string $type
+ *   The type of buttons that the hook should invoke.
+ *
+ * @return array
+ *   Render array with the buttons.
+ */
+function _ding_entity_invoke_entity_buttons_hook($entity, $type = '') {
+  $hook = 'ding_entity_buttons';
+  $buttons = array();
+  foreach (module_implements($hook) as $module) {
+    $function = $module . '_' . $hook;
+    if (function_exists($function)) {
+      $result = call_user_func_array($function, array('ding_entity', $entity, $type, $buttons));
+      if (isset($result) && is_array($result)) {
+        $buttons = array_merge_recursive($buttons, $result);
+      }
+      elseif (isset($result)) {
+        $buttons[] = $result;
+      }
+    }
+  }
+
+  return $buttons;
 }
 
 /**
