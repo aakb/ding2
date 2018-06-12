@@ -236,11 +236,26 @@ function ding_entity_field_formatter_view($entity_type, $entity, $field, $instan
   foreach ($items as $delta => $item) {
     switch ($display['type']) {
       case 'ding_entity_buttons_default':
-        $element[$delta] = module_invoke_all('ding_entity_buttons', 'ding_entity', $entity);
+        $element[$delta] = module_invoke_all('ding_entity_buttons', 'ding_entity', $entity, '', $element);
         break;
 
       case 'ding_entity_buttons_ajax':
-        $element[$delta] = module_invoke_all('ding_entity_buttons', 'ding_entity', $entity, 'ajax');
+        $hook = 'ding_entity_buttons';
+        $buttons = array();
+        foreach (module_implements($hook) as $module) {
+          $function = $module . '_' . $hook;
+          if (function_exists($function)) {
+            $result = call_user_func_array($function, array('ding_entity', $entity, 'ajax', $buttons));
+            if (isset($result) && is_array($result)) {
+              $buttons = array_merge_recursive($buttons, $result);
+            }
+            elseif (isset($result)) {
+              $buttons[] = $result;
+            }
+          }
+        }
+
+        $element[$delta] = $buttons;
         break;
     }
   }

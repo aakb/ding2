@@ -64,10 +64,10 @@ function ting_das_libraries_info() {
 /**
  * Implements hook_ding_entity_buttons().
  */
-function ting_das_ding_entity_buttons($type, $entity, $widget = 'default') {
+function ting_das_ding_entity_buttons($type, $entity, $widget = 'default', $buttons = array()) {
   $button = '';
 
-  if (_ting_das_show_button($type, $entity)) {
+  if (_ting_das_show_button($type, $entity, $buttons)) {
     switch ($widget) {
       case 'ajax':
         drupal_add_library('system', 'drupal.ajax');
@@ -262,8 +262,6 @@ function ting_das_order_form_ajax_callback($form, &$form_state) {
     '#commands' => array(),
   );
 
-  $t = form_get_errors();
-
   if (is_null(form_get_errors())) {
     $values = $form_state['values'];
     $client = _ting_das_get_client();
@@ -327,13 +325,21 @@ function _ting_das_get_client() {
  *   The entity type.
  * @param \TingEntity $entity
  *   The TingEntity that should or should not have the "order" button shown.
+ * @param array $buttons
+ *   The buttons already added by other modules.
  *
  * @return bool
  *   TRUE if it should be shown else FALSE.
  */
-function _ting_das_show_button($type, TingEntity $entity) {
+function _ting_das_show_button($type, TingEntity $entity, $buttons) {
   $types = array_filter(_ting_das_get_default_well_types());
   if ($type == 'ding_entity' && in_array(drupal_strtolower($entity->getType()), $types)) {
+    foreach ($buttons as $button) {
+      if (!empty($button) && isset($button[0]['#markup']) && strpos($button[0]['#markup'], 'button-see-online') !== false ) {
+        return FALSE;
+      }
+    }
+
     return TRUE;
   }
 
