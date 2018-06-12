@@ -153,6 +153,11 @@ function ting_das_ajax($entity) {
 function ting_das_order_form($form_id, &$form_state, TingEntity $entity) {
   $form = array(
     '#prefix' => '<div class="popupbar-title"><strong>' . t('Fillout the form to order at digital copy') . '</strong></div>',
+    '#attributes' => array(
+      'class' => array(
+        'digital-order-form',
+      ),
+    ),
   );
 
   global $user;
