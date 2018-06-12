@@ -1,0 +1,46 @@
+.popupbar {
+    height: 90% !important;
+    overflow-y: auto;
+}
+.popupbar .popupbar-container {
+    margin-bottom: 50px;
+}
+.popupbar .popupbar-container .popupbar-title{
+    padding-top: 20px;
+}
+.popupbar .popupbar-container input[disabled="disabled"] {
+    opacity: .5;
+    cursor: not-allowed;
+    transition: opacity .37s ease-in;
+}
+.popupbar .popupbar-container .form-submit {
+    transition: opacity .27s ease-out;
+}
+@media screen and (min-width: 600px) {
+    .popupbar .form-item.form-item-name,
+    .popupbar .form-item.form-item-mail,
+    .popupbar .form-item.form-item-loaner-id {
+        width: 31.333%;
+        float: left;
+        margin-right: 3%
+    }
+    .popupbar .form-item.form-item-loaner-id {
+        margin-right: 0;
+    }
+    .popupbar .form-item-fbs-preferred-branch,
+    .popupbar .form-item-interest-period {
+        width: 48.5%;
+        float: left;
+        margin-right: 3%;
+    }
+    .popupbar .form-item-interest-period {
+        margin-right: 0;
+    }
+}
+
+/*
+* HTML for title element - Add right after the .popupbar-close element inside the .popupbar-container
+*
+* <div class="popupbar-title"><strong>Udfyld formularen for at bestille en digital kopi</strong></div>
+*
+*/
