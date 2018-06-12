@@ -1,0 +1,45 @@
+.popupbar .popupbar-container {
+    margin-bottom: 40px;
+}
+.popupbar .popupbar-container .popupbar-content {
+    padding: 40px 0 20px;
+}
+.popupbar .popupbar-container .popupbar-title{
+    padding-bottom: 10px;
+}
+.popupbar-title {}
+.popupbar .popupbar-container input[disabled="disabled"] {
+    opacity: .5;
+    cursor: not-allowed;
+    transition: opacity .37s ease-in;
+}
+.popupbar .popupbar-container .form-submit {
+    transition: opacity .27s ease-out;
+}
+@media screen and (min-width: 600px) {
+    .popupbar .digital-order-form .form-item.form-item-name,
+    .popupbar .digital-order-form .form-item.form-item-mail,
+    .popupbar .digital-order-form .form-item.form-item-loaner-id {
+        width: 31.333%;
+        float: left;
+        margin-right: 3%
+    }
+    .popupbar .digital-order-form .form-item.form-item-loaner-id {
+        margin-right: 0;
+    }
+    .popupbar .digital-order-form .form-item-fbs-preferred-branch,
+    .popupbar .digital-order-form .form-item-interest-period {
+        width: 48.5%;
+        float: left;
+        margin-right: 3%;
+    }
+    .popupbar .digital-order-form .form-item-interest-period {
+        margin-right: 0;
+    }
+}
+@media screen and (max-width: 600px) {
+    .popupbar {
+        height: 90% !important;
+        overflow-y: auto !important;
+    }
+}
