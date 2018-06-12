@@ -88,6 +88,11 @@ function ting_das_ding_entity_buttons($type, $entity, $widget = 'default') {
               ),
               'html' => FALSE,
             ),
+            '#attached' => array(
+              'css' => array(
+                drupal_get_path('module', 'ting_das') . '/css/ting_das.css',
+              ),
+            ),
           ),
         );
         break;
@@ -146,7 +151,9 @@ function ting_das_ajax($entity) {
  *   The form.
  */
 function ting_das_order_form($form_id, &$form_state, TingEntity $entity) {
-  $form = array();
+  $form = array(
+    '#prefix' => '<div class="popupbar-title"><strong>' . t('Fillout the form to order at digital copy') . '</strong></div>',
+  );
 
   global $user;
   $provider = _ding_provider_get_provider('user');
