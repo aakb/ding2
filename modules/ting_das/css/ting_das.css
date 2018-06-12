@@ -1,7 +1,3 @@
-.popupbar {
-    height: 90% !important;
-    overflow-y: auto;
-}
 .popupbar .popupbar-container {
     margin-bottom: 50px;
 }
@@ -37,10 +33,9 @@
         margin-right: 0;
     }
 }
-
-/*
-* HTML for title element - Add right after the .popupbar-close element inside the .popupbar-container
-*
-* <div class="popupbar-title"><strong>Udfyld formularen for at bestille en digital kopi</strong></div>
-*
-*/
+@media screen and (max-width: 600px) {
+    .popupbar {
+        height: 90% !important;
+        overflow-y: auto !important;
+    }
+}
