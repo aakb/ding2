@@ -1435,7 +1435,47 @@ function ding_event_field_default_field_instances() {
       'module' => 'link',
       'settings' => array(),
       'type' => 'link_field',
-      'weight' => 1,
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'taxonomy_term-event_organizer-field_remote_id'.
+  $field_instances['taxonomy_term-event_organizer-field_remote_id'] = array(
+    'bundle' => 'event_organizer',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 1,
+      ),
+    ),
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_remote_id',
+    'label' => 'Remote ID',
+    'required' => 1,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 2,
     ),
   );
 
@@ -1462,11 +1502,13 @@ function ding_event_field_default_field_instances() {
   t('Organizer');
   t('Place / Room');
   t('Price');
+  t('Remote ID');
   t('Select the libraries this content should be associated with.');
   t('Tags');
   t('Target');
   t('Title image');
   t('Use this to direct your guests to the correct place');
+
 
   return $field_instances;
 }
