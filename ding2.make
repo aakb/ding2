@@ -621,3 +621,15 @@ libraries[smart-app-banner][download][type] = "get"
 libraries[smart-app-banner][download][url] = https://github.com/kudago/smart-app-banner/archive/v1.3.0.zip
 libraries[smart-app-banner][directory_name] = "smart-app-banner"
 libraries[smart-app-banner][destination] = "libraries"
+
+; For ding_libs.
+libraries[cropperjs][download][type] = "get"
+libraries[cropperjs][download][url] = https://github.com/fengyuanchen/cropperjs/archive/v1.5.6.zip
+libraries[cropperjs][directory_name] = "cropperjs"
+libraries[cropperjs][destination] = "libraries"
+
+; For ding_libs.
+libraries[jquery-cropper][download][type] = "get"
+libraries[jquery-cropper][download][url] = https://github.com/fengyuanchen/jquery-cropper/archive/v1.0.1.zip
+libraries[jquery-cropper][directory_name] = "jquery-cropper"
+libraries[jquery-cropper][destination] = "libraries"
