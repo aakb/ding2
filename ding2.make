@@ -633,3 +633,9 @@ libraries[jquery-cropper][download][type] = "get"
 libraries[jquery-cropper][download][url] = https://github.com/fengyuanchen/jquery-cropper/archive/v1.0.1.zip
 libraries[jquery-cropper][directory_name] = "jquery-cropper"
 libraries[jquery-cropper][destination] = "libraries"
+
+; For ding_libs.
+libraries[camanjs][download][type] = "get"
+libraries[camanjs][download][url] = https://github.com/meltingice/CamanJS/archive/v4.1.2.zip
+libraries[camanjs][directory_name] = "camanjs"
+libraries[camanjs][destination] = "libraries"
