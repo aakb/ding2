@@ -9,6 +9,10 @@ function aakb_writing_competition_permission() {
       'title' => t('Access writing competition'),
       'description' => t('See competition settings and contributes.'),
     ),
+    'export writing competition' => array(
+      'title' => t('Export writing competition'),
+      'description' => t('Export submitted contributes.'),
+    ),
   );
 }
 
@@ -16,25 +20,43 @@ function aakb_writing_competition_permission() {
  * Implements hook_menu().
  */
 function aakb_writing_competition_menu() {
-  $item = [];
+  $items = [];
 
-  $item['skrivekonkurrence'] = [
+  $items['skrivekonkurrence'] = [
     'title' => _aakb_writing_competition_t('Writing competition'),
     'page callback' => 'drupal_get_form',
     'page arguments' => ['aakb_writing_competition_form'],
     'access callback' => TRUE,
   ];
 
-  $item['admin/config/ding/competition'] = [
-    'title' => _aakb_writing_competition_t('Writing competition'),
+  $items['admin/config/ding/competition'] = [
+    'title' => 'Writing competition',
     'description' => t('See competition settings and contributes.'),
     'page callback' => 'drupal_get_form',
     'page arguments' => ['aakb_writing_competition_admin'],
     'access arguments' => ['access writing competition'],
-    'file' => 'includes/aakb_writing_competition.admin.inc'
+    'file' => 'includes/aakb_writing_competition.admin.inc',
+    'priority' => 1,
   ];
 
-  return $item;
+  $items['admin/config/ding/competition/config'] = array(
+    'title' => 'Configuration',
+    'description' => 'See competition settings and contributes',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/config/ding/competition/export'] = array(
+    'title' => 'Export',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['aakb_writing_competition_export'],
+    'access arguments' => ['export writing competition'],
+    'file' => 'includes/aakb_writing_competition.admin.inc',
+    'weight' => -20,
+  );
+
+  return $items;
 }
 
 /**

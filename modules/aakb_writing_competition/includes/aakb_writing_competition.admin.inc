@@ -32,3 +32,8 @@ function aakb_writing_competition_admin($form, &$form_state) {
 
   return system_settings_form($form);
 }
+
+
+function aakb_writing_competition_export($form, &$form_state) {
+  return system_settings_form($form);
+}
