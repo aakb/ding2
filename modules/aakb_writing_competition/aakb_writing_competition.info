@@ -1,0 +1,5 @@
+name = AAKB Writing Competition
+description = Aakb Writing Competition
+core = 7.x
+package = AAKB
+dependencies[] = 'maxlength'

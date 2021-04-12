@@ -1,0 +1,133 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function aakb_writing_competition_menu() {
+  $item = [];
+
+  $item['skrivekonkurrence'] = [
+    'title' => 'Skrivekonkurrence',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['aakb_writing_competition_form'],
+    'access callback' => TRUE,
+  ];
+
+  return $item;
+}
+
+/**
+ * Implements hook_form().
+ */
+function aakb_writing_competition_form($form, &$form_state) {
+  $form = [];
+
+  $form['type'] = [
+    '#type' => 'select',
+    '#title' => _aakb_writing_competition_t('Type'),
+    '#description' => _aakb_writing_competition_t('Select who you are?'),
+    '#options' => [
+      'parent' => _aakb_writing_competition_t('Parent'),
+      'teacher' => _aakb_writing_competition_t('Teacher'),
+    ],
+    '#required' => TRUE,
+  ];
+
+  $form['parent'] = [
+    '#type' => 'fieldset',
+    '#title' => _aakb_writing_competition_t('Parent information'),
+    '#tree' => TRUE,
+    '#states' => [
+      'visible' => array(
+        ':input[name="type"]' => array(
+          'value' => 'parent',
+        ),
+      ),
+    ],
+  ];
+
+  $form['parent']['name'] = [
+    '#type' => 'textfield',
+    '#title' => _aakb_writing_competition_t('Parent name'),
+  ];
+
+  $form['parent']['mail'] = [
+    '#type' => 'textfield',
+    '#title' => _aakb_writing_competition_t('Parent e-mail-address'),
+  ];
+
+  $form['teacher'] = [
+    '#type' => 'fieldset',
+    '#title' => _aakb_writing_competition_t('Teacher information'),
+    '#tree' => TRUE,
+    '#states' => [
+      'visible' => array(
+        ':input[name="type"]' => array(
+          'value' => 'teacher',
+        ),
+      ),
+    ],
+  ];
+
+  $form['teacher']['name'] = [
+    '#type' => 'textfield',
+    '#title' => _aakb_writing_competition_t('Teacher name'),
+  ];
+
+  $form['teacher']['mail'] = [
+    '#type' => 'textfield',
+    '#title' => _aakb_writing_competition_t('Teacher e-mail-address'),
+  ];
+
+  $form['teacher']['grade'] = [
+    '#type' => 'textfield',
+    '#title' => _aakb_writing_competition_t('Grade'),
+  ];
+
+  $form['contribution'] = [
+    '#type' => 'fieldset',
+    '#title' => _aakb_writing_competition_t('Contribution')
+  ];
+
+  $form['contribution']['name'] = [
+    '#type' => 'textfield',
+    '#title' => _aakb_writing_competition_t('Name'),
+    '#required' => TRUE,
+  ];
+
+  $form['contribution']['age'] = [
+    '#type' => 'textfield',
+    '#title' => _aakb_writing_competition_t('Age'),
+    '#required' => TRUE,
+  ];
+
+  $form['contribution']['text'] = [
+    '#type' => 'textarea',
+    '#title' => _aakb_writing_competition_t('Text'),
+    '#required' => TRUE,
+    '#maxlength_js' => TRUE,
+    '#maxlength' => 500,
+  ];
+
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#value' => _aakb_writing_competition_t('Submit'),
+  ];
+
+  return $form;
+}
+
+/**
+ * Translation helper function.
+ *
+ * @param string $string
+ *   The string to translate.
+ * @param array $args
+ *   Arguments to substitution in the string.
+ *
+ * @return array|mixed|string|null
+ *   The translation.
+ */
+function _aakb_writing_competition_t($string, $args = []) {
+  return t($string, $args, ['context' => 'writing_competition']);
+}
