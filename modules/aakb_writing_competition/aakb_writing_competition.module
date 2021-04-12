@@ -1,16 +1,37 @@
 <?php
 
 /**
+ * Implements hook_permission().
+ */
+function aakb_writing_competition_permission() {
+  return array(
+    'access writing competition' => array(
+      'title' => t('Access writing competition'),
+      'description' => t('See competition settings and contributes.'),
+    ),
+  );
+}
+
+/**
  * Implements hook_menu().
  */
 function aakb_writing_competition_menu() {
   $item = [];
 
   $item['skrivekonkurrence'] = [
-    'title' => 'Skrivekonkurrence',
+    'title' => _aakb_writing_competition_t('Writing competition'),
     'page callback' => 'drupal_get_form',
     'page arguments' => ['aakb_writing_competition_form'],
     'access callback' => TRUE,
+  ];
+
+  $item['admin/config/ding/competition'] = [
+    'title' => _aakb_writing_competition_t('Writing competition'),
+    'description' => t('See competition settings and contributes.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['aakb_writing_competition_admin'],
+    'access arguments' => ['access writing competition'],
+    'file' => 'includes/aakb_writing_competition.admin.inc'
   ];
 
   return $item;
@@ -36,6 +57,7 @@ function aakb_writing_competition_form($form, &$form_state) {
   $form['parent'] = [
     '#type' => 'fieldset',
     '#title' => _aakb_writing_competition_t('Parent information'),
+    '#description' => 'TEXT TEXT TEXT',
     '#tree' => TRUE,
     '#states' => [
       'visible' => array(
@@ -59,6 +81,7 @@ function aakb_writing_competition_form($form, &$form_state) {
   $form['teacher'] = [
     '#type' => 'fieldset',
     '#title' => _aakb_writing_competition_t('Teacher information'),
+    '#description' => 'TEXT TEXT TEXT',
     '#tree' => TRUE,
     '#states' => [
       'visible' => array(
@@ -117,6 +140,12 @@ function aakb_writing_competition_form($form, &$form_state) {
   return $form;
 }
 
+function aakb_writing_competition_form_submit($form_state) {
+  $t=1;
+
+  drupal_set_message(_aakb_writing_competition_t('Thanks for contributing to the writing competition'));
+}
+
 /**
  * Translation helper function.
  *
@@ -130,4 +159,17 @@ function aakb_writing_competition_form($form, &$form_state) {
  */
 function _aakb_writing_competition_t($string, $args = []) {
   return t($string, $args, ['context' => 'writing_competition']);
+}
+
+function _aakb_writing_competition_get_admin_defaults() {
+  return variable_get('aakb_writing_competition', []) + [
+    'parent' => [
+      'format' => 'ding_wysiwyg',
+      'value' => '',
+    ],
+    'teacher' => [
+      'format' => 'ding_wysiwyg',
+      'value' => '',
+    ],
+  ];
 }
