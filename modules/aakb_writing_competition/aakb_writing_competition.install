@@ -1,5 +1,88 @@
 <?php
 
+
+/**
+ * Implements hook_schema().
+ */
+function aakb_writing_competition_schema() {
+  $schema = [];
+
+  $schema['writing_competition'] = [
+    'description' => 'Data submitted to the writing competition.',
+    'fields' => [
+      'id' => [
+        'description' => 'The primary identifier for a record.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'submitted' => [
+        'description' => 'The Unix timestamp when the contribution was submitted.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'type' => [
+        'description' => 'The type of submitter (parent or teacher).',
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'name' => [
+        'description' => 'The name of the (parent or teacher).',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'mail' => [
+        'description' => 'The e-mail-address (parent or teacher).',
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'contrib_grade' => [
+        'description' => 'Which grade is the contributor in.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => FALSE,
+        'default' => '',
+      ],
+      'contrib_name' => [
+        'description' => 'The name of the contributor.',
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'contrib_age' => [
+        'description' => 'The contributors age.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'contribution' => [
+        'description' => 'The contributors contribution.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'default' => '',
+      ],
+    ],
+    'indexes' => [
+      'submitted' => [
+        'submitted',
+      ],
+    ],
+    'primary key' => [
+      'id',
+    ],
+  ];
+
+  return $schema;
+}
+
 /**
  * Implements hook_uninstall().
  */
