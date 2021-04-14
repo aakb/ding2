@@ -97,6 +97,7 @@ function aakb_writing_competition_form($form, &$form_state, $no_js_use = FALSE) 
   $form['parent']['mail'] = [
     '#type' => 'textfield',
     '#title' => _aakb_writing_competition_t('Parent e-mail-address'),
+    '#element_validate' => ['aakb_writing_competition_validate_mail'],
   ];
 
   $form['teacher'] = [
@@ -121,6 +122,7 @@ function aakb_writing_competition_form($form, &$form_state, $no_js_use = FALSE) 
   $form['teacher']['mail'] = [
     '#type' => 'textfield',
     '#title' => _aakb_writing_competition_t('Teacher e-mail-address'),
+    '#element_validate' => ['aakb_writing_competition_validate_mail'],
   ];
 
   $form['teacher']['grade'] = [
@@ -155,6 +157,7 @@ function aakb_writing_competition_form($form, &$form_state, $no_js_use = FALSE) 
       '#type' => 'textfield',
       '#title' => _aakb_writing_competition_t('Age'),
       '#required' => TRUE,
+      '#element_validate' => ['element_validate_integer_positive'],
     ];
 
     $form['contribution'][$i]['text'] = [
@@ -209,6 +212,23 @@ function aakb_writing_competition_form($form, &$form_state, $no_js_use = FALSE) 
 }
 
 /**
+ * E-mail field validation.
+ *
+ * @param $element
+ * @param $form_state
+ */
+function aakb_writing_competition_validate_mail($element, &$form_state) {
+  $value = $element['#value'];
+
+  // We have more mail fields in the form that should be ignore based on the
+  // type selected in the form.
+  $ignore = $element['#parents'][0] !== $form_state['values']['type'];
+  if (!$ignore && !valid_email_address($value)) {
+    form_error($element, 'Your email address appears malformed');
+  }
+}
+
+/**
  * Callback for both ajax-enabled buttons.
  *
  * Selects and returns the fieldset with the names in it.
@@ -242,8 +262,27 @@ function aakb_writing_competition_add_more_remove_one($form, &$form_state) {
 /**
  * Submit handler for the contribution form.
  */
-function aakb_writing_competition_form_submit($form_state) {
-  $t=1;
+function aakb_writing_competition_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
+
+  $type = $values['type'];
+  $record = [
+    'submitted' => time(),
+    'type' => $type,
+    'name' => $values[$type]['name'],
+    'mail' => $values[$type]['mail'],
+    'contrib_grade' => $type === 'teacher' ? $values[$type]['grade'] : '',
+  ];
+
+  unset($values['contribution']['add_contribution']);
+  foreach ($values['contribution'] as $contribution) {
+    $new = $record + [
+      'contrib_name' => $contribution['name'],
+      'contrib_age' => $contribution['age'],
+      'contribution' => $contribution['text'],
+    ];
+    drupal_write_record('writing_competition', $new);
+  }
 
   drupal_set_message(_aakb_writing_competition_t('Thanks for contributing to the writing competition'));
 }
