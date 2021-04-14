@@ -12,7 +12,7 @@ function aakb_writing_competition_admin($form, &$form_state) {
     '#tree' => TRUE,
   ];
 
-  $defaults = _aakb_writing_competition_get_admin_defaults();
+  $defaults = _aakb_writing_competition_get_config();
 
   $form['aakb_writing_competition']['parent'] = [
     '#type' => 'text_format',

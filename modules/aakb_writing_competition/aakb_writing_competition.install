@@ -87,5 +87,5 @@ function aakb_writing_competition_schema() {
  * Implements hook_uninstall().
  */
 function aakb_writing_competition_uninstall() {
-
+  variable_del('aakb_writing_competition');
 }

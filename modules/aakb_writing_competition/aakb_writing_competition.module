@@ -62,9 +62,7 @@ function aakb_writing_competition_menu() {
 /**
  * Implements hook_form().
  */
-function aakb_writing_competition_form($form, &$form_state) {
-  $form = [];
-
+function aakb_writing_competition_form($form, &$form_state, $no_js_use = FALSE) {
   $form['type'] = [
     '#type' => 'select',
     '#title' => _aakb_writing_competition_t('Type'),
@@ -76,10 +74,11 @@ function aakb_writing_competition_form($form, &$form_state) {
     '#required' => TRUE,
   ];
 
+  $config = _aakb_writing_competition_get_config();
   $form['parent'] = [
     '#type' => 'fieldset',
     '#title' => _aakb_writing_competition_t('Parent information'),
-    '#description' => 'TEXT TEXT TEXT',
+    '#description' => $config['parent']['value'],
     '#tree' => TRUE,
     '#states' => [
       'visible' => array(
@@ -103,7 +102,7 @@ function aakb_writing_competition_form($form, &$form_state) {
   $form['teacher'] = [
     '#type' => 'fieldset',
     '#title' => _aakb_writing_competition_t('Teacher information'),
-    '#description' => 'TEXT TEXT TEXT',
+    '#description' => $config['teacher']['value'],
     '#tree' => TRUE,
     '#states' => [
       'visible' => array(
@@ -131,28 +130,74 @@ function aakb_writing_competition_form($form, &$form_state) {
 
   $form['contribution'] = [
     '#type' => 'fieldset',
-    '#title' => _aakb_writing_competition_t('Contribution')
+    '#title' => _aakb_writing_competition_t('Contribution'),
+    '#prefix' => '<div id="contributions-fieldset-wrapper">',
+    '#suffix' => '</div>'
   ];
 
-  $form['contribution']['name'] = [
-    '#type' => 'textfield',
-    '#title' => _aakb_writing_competition_t('Name'),
-    '#required' => TRUE,
-  ];
+  if (empty($form_state['num_contributions'])) {
+    $form_state['num_contributions'] = 1;
+  }
+  for ($i = 0; $i < $form_state['num_contributions']; $i++) {
+    $form['contribution'][$i] = [
+      '#type' => 'fieldset',
+      '#title' => $form_state['num_contributions'] != 1 ? _aakb_writing_competition_t('Number !num', ['!num' => $i + 1]) : '',
+    ];
 
-  $form['contribution']['age'] = [
-    '#type' => 'textfield',
-    '#title' => _aakb_writing_competition_t('Age'),
-    '#required' => TRUE,
-  ];
+    $form['contribution'][$i]['name'] = [
+      '#type' => 'textfield',
+      '#title' => _aakb_writing_competition_t('Name'),
+      '#required' => TRUE,
+    ];
 
-  $form['contribution']['text'] = [
-    '#type' => 'textarea',
-    '#title' => _aakb_writing_competition_t('Text'),
-    '#required' => TRUE,
-    '#maxlength_js' => TRUE,
-    '#maxlength' => 500,
-  ];
+    $form['contribution'][$i]['age'] = [
+      '#type' => 'textfield',
+      '#title' => _aakb_writing_competition_t('Age'),
+      '#required' => TRUE,
+    ];
+
+    $form['contribution'][$i]['text'] = [
+      '#type' => 'textarea',
+      '#title' => _aakb_writing_competition_t('Text'),
+      '#required' => TRUE,
+      '#maxlength_js' => TRUE,
+      '#maxlength' => 500,
+      '#default_value' => '',
+    ];
+  }
+
+  $form['contribution']['add_contribution'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add one more'),
+    '#submit' => array(
+      'aakb_writing_competition_add_more_add_one',
+    ),
+    '#states' => [
+      'visible' => array(
+        ':input[name="type"]' => array(
+          'value' => 'teacher',
+        ),
+      ),
+    ],
+    '#ajax' => array(
+      'callback' => 'aakb_writing_competition_add_more_callback',
+      'wrapper' => 'contributions-fieldset-wrapper',
+    ),
+  );
+
+  if ($form_state['num_contributions'] > 1) {
+    $form['contribution']['remove_name'] = array(
+      '#type' => 'submit',
+      '#value' => t('Remove one'),
+      '#submit' => array(
+        'aakb_writing_competition_add_more_remove_one',
+      ),
+      '#ajax' => array(
+        'callback' => 'aakb_writing_competition_add_more_callback',
+        'wrapper' => 'contributions-fieldset-wrapper',
+      ),
+    );
+  }
 
   $form['submit'] = [
     '#type' => 'submit',
@@ -162,6 +207,40 @@ function aakb_writing_competition_form($form, &$form_state) {
   return $form;
 }
 
+/**
+ * Callback for both ajax-enabled buttons.
+ *
+ * Selects and returns the fieldset with the names in it.
+ */
+function aakb_writing_competition_add_more_callback($form, $form_state) {
+  return $form['contribution'];
+}
+
+/**
+ * Submit handler for the "add-one-more" button.
+ *
+ * Increments the max counter and causes a rebuild.
+ */
+function aakb_writing_competition_add_more_add_one($form, &$form_state) {
+  $form_state['num_contributions']++;
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Submit handler for the "remove one" button.
+ *
+ * Decrements the max counter and causes a form rebuild.
+ */
+function aakb_writing_competition_add_more_remove_one($form, &$form_state) {
+  if ($form_state['num_contributions'] > 1) {
+    $form_state['num_contributions']--;
+  }
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Submit handler for the contribution form.
+ */
 function aakb_writing_competition_form_submit($form_state) {
   $t=1;
 
@@ -183,7 +262,7 @@ function _aakb_writing_competition_t($string, $args = []) {
   return t($string, $args, ['context' => 'writing_competition']);
 }
 
-function _aakb_writing_competition_get_admin_defaults() {
+function _aakb_writing_competition_get_config() {
   return variable_get('aakb_writing_competition', []) + [
     'parent' => [
       'format' => 'ding_wysiwyg',
