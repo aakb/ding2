@@ -132,7 +132,8 @@ function aakb_writing_competition_form($form, &$form_state, $no_js_use = FALSE) 
     '#type' => 'fieldset',
     '#title' => _aakb_writing_competition_t('Contribution'),
     '#prefix' => '<div id="contributions-fieldset-wrapper">',
-    '#suffix' => '</div>'
+    '#suffix' => '</div>',
+    '#tree' => TRUE,
   ];
 
   if (empty($form_state['num_contributions'])) {
