@@ -70,7 +70,6 @@ function aakb_writing_competition_schema() {
         'description' => 'The contributors contribution.',
         'type' => 'text',
         'not null' => TRUE,
-        'default' => '',
       ],
     ],
     'indexes' => [
