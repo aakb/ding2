@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @file
+ * Handle install and uninstall.
+ */
 
 /**
  * Implements hook_schema().

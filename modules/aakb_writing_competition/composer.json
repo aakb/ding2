@@ -1,0 +1,6 @@
+{
+    "require": {
+        "symfony/yaml": "^3.4",
+        "box/spout": "^2.7"
+    }
+}

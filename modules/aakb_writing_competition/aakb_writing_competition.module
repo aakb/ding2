@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Handle basic module and the user based form.
+ */
 
 /**
  * Implements hook_permission().
@@ -49,14 +53,36 @@ function aakb_writing_competition_menu() {
   $items['admin/config/ding/competition/export'] = array(
     'title' => 'Export',
     'type' => MENU_LOCAL_TASK,
-    'page callback' => 'drupal_get_form',
-    'page arguments' => ['aakb_writing_competition_export'],
+    'page callback' => 'aakb_writing_competition_export',
     'access arguments' => ['export writing competition'],
-    'file' => 'includes/aakb_writing_competition.admin.inc',
+    'file' => 'includes/aakb_writing_competition.export.inc',
     'weight' => -20,
   );
 
+  $items['admin/config/ding/competition/export/excel'] = array(
+    'title' => 'Export',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'aakb_writing_competition_export_excel',
+    'access arguments' => ['export writing competition'],
+    'file' => 'includes/aakb_writing_competition.export.inc',
+  );
+
   return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function aakb_writing_competition_theme($existing, $type, $theme, $path) {
+  return array(
+    'aakb_writing_competition_export' => array(
+      'variables' => array(
+        'count' => NULL,
+        'link' => NULL,
+      ),
+      'template' => 'templates/aakb-writing-competition-export'
+    ),
+  );
 }
 
 /**
