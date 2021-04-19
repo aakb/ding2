@@ -89,8 +89,11 @@ function aakb_writing_competition_theme($existing, $type, $theme, $path) {
  * Implements hook_form().
  */
 function aakb_writing_competition_form($form, &$form_state, $no_js_use = FALSE) {
-  $form['#prefix'] = '<h1>' . _aakb_writing_competition_t('Writing Competition') .'</h1>';
+  // Disable page cache for this form as it has "add one more" that will return
+  // cached content and not another rendering with more options.
+  drupal_page_is_cacheable(FALSE);
 
+  $form['#prefix'] = '<h1>' . _aakb_writing_competition_t('Writing Competition') .'</h1>';
   $form['type'] = [
     '#type' => 'select',
     '#title' => _aakb_writing_competition_t('Select who you are?'),
